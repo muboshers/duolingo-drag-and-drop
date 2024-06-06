@@ -5,19 +5,23 @@ import {
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Droppable from "@/components/Dropable";
 import { extractBracketWord, message, options } from "@/@mock/draggable";
 import Draggable from "@/components/Draggable";
+import { customWindow } from "@/utils/window";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 
 export default function Home() {
   const [activeElement, setActiveElement] = useState<any | null>(null);
+  const [addedOptions, setAddedOptions] = useState<any | null>(null);
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(customWindow.innerWidth <= 768 ? TouchSensor : PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -35,6 +39,9 @@ export default function Home() {
         sensors={sensors}
         onDragStart={(e) => {
           setActiveElement(e.active.data.current?.element);
+          const option = e.active.data.current?.element?.option;
+          if (!option) return;
+          setAddedOptions([...(addedOptions ?? []), option]);
         }}
         onDragCancel={() => {
           setActiveElement(null);
@@ -64,6 +71,7 @@ export default function Home() {
             ))}
           </div>
         </div>
+
         <DragOverlay modifiers={[restrictToWindowEdges]}>
           {activeElement && (
             <p className="drag-item" {...activeElement}>

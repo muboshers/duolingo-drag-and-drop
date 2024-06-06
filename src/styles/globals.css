@@ -29,5 +29,6 @@
 .drag-item {
   padding: 10px 30px;
   border-radius: 10px;
+  user-select: none;
   background-color: #e8e8e8;
 }
